@@ -1,0 +1,64 @@
+Public logger As Integer
+Public lResult As Long
+Public lError As Variant
+Public lastrow_Ingredients As Integer
+Public loops As Integer
+Public Ingredients As Integer
+Public x As String
+Public llResult As Long
+Public llError As Variant
+Public lastrow_results As Long
+     
+
+Sub Main()
+
+'Start logging runtime
+ThisWorkbook.Sheets("log").Cells(1, 1).Value = "Runtime start:"
+ThisWorkbook.Sheets("log").Cells(1, 2).Value = Format(Now(), "yyyy-MM-dd hh:mm:ss")
+
+'Selecting WB and materials
+ThisWorkbook.Sheets("Ingredients").Select
+
+lastrow_Ingredients = ThisWorkbook.Sheets("Ingredients").Cells(Sheets("Ingredients").Rows.Count, "A").End(xlUp).Row
+
+logger = 1
+
+'For loop to loop through material list by 3 steps
+
+For Ingredients = 18 To 18
+           
+    x = RangeToString(Sheets("Ingredients").Cells(Ingredients + 1, 1))
+        
+    Debug.Print (Ingredients)
+    Debug.Print (x)
+    
+    llResult = Application.Run("SAPSetVariable", "GFMVS_WU_INGREDIENTS", x, "INPUT_STRING", "DS_1")
+    
+    llError = Application.Run("SAPGetProperty", "LastError", "Number")
+    
+    lastrow_results = ThisWorkbook.Sheets("Results").Cells(Sheets("Results").Rows.Count, "A").End(xlUp).Row
+    
+    If lastrow_results > 1 Then 'Check if there
+       
+        'Move it into access database
+        
+        Call Rename_Headers
+        
+        Call SQL_InsertIntoTbl
+        
+        'Logg results
+        
+    
+    Else
+    
+    End If
+    
+    Call Logging
+    
+Next
+
+Exit Sub
+
+ErrorHandler:
+
+End Sub
